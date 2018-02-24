@@ -23,5 +23,4 @@ variable "availability_zones" {
 
 variable "name" {
   description = "Name tag, e.g my-stack"
-  default     = "my-stack"
 }

@@ -1,4 +1,14 @@
 /**
+ * The VPC module will create a VPC with 1 public and 1 private subnet inside each specified availability zone.
+ * It will also attach an Internet Gateway to the VPC and attach Route Tables directing traffic from the public subnets to it
+ * as well as create NAT Gateways and route private subnet traffic through them so instances in the private subnets can access the internet.
+ * Since most of our instances aren't exposed to the external internet, the VPC has a bastion that acts as the gatekeeper for any direct SSH access.
+ * The bastion is provisioned using the key name that you pass to the stack (and hopefully have stored somewhere).
+ * If you ever need to access an instance directly, you can do it by "jumping through" the bastion.
+ *
+ */
+
+/**
  * VPC
  */
 
@@ -35,7 +45,7 @@ resource "aws_nat_gateway" "main" {
 
 resource "aws_eip" "nat" {
   count = "${length(var.internal_subnets)}"
-  vpc = true
+  vpc   = true
 }
 
 /**

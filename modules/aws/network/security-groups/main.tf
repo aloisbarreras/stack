@@ -14,9 +14,8 @@ variable "environment" {
   description = "The environment, used for tagging, e.g prod"
 }
 
-resource "aws_security_group" "allow_all_outbound" {
-  name        = "${format("%s-%s-allow-all-outbound", var.name, var.environment)}"
-  description = "Allows ssh from the world"
+resource "aws_security_group" "default" {
+  name        = "${format("%s-%s-default", var.name, var.environment)}"
   vpc_id      = "${var.vpc_id}"
 
   egress {
@@ -31,7 +30,7 @@ resource "aws_security_group" "allow_all_outbound" {
   }
 
   tags {
-    Name        = "${format("%s allow-all-outbound", var.name)}"
+    Name        = "${format("%s default", var.name)}"
     Environment = "${var.environment}"
   }
 }
@@ -83,9 +82,8 @@ resource "aws_security_group_rule" "internal_ssh" {
   security_group_id        = "${aws_security_group.internal_ssh.id}"
 }
 
-// allows all outgoing traffic
-output "allow_all_outbound" {
-  value = "${aws_security_group.allow_all_outbound.id}"
+output "default" {
+  value = "${aws_security_group.default.id}"
 }
 
 // External SSH allows ssh connections on port 22 from the world.

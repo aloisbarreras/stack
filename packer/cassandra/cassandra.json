@@ -4,7 +4,9 @@
     "profile": "",
     "aws_region": "",
     "ami_users": "",
-    "commit_sha": ""
+    "commit_sha": "",
+    "ansible_host": "default",
+    "ansible_connection": "docker"
   },
   "builders": [
     {
@@ -30,12 +32,51 @@
         "OS_Version": "CentOS",
         "Name": "{{user `name`}}"
       }
+    },
+    {
+      "type": "docker",
+      "image": "centos:7",
+      "commit": true,
+      "run_command": [
+        "-d",
+        "-i",
+        "-t",
+        "--name",
+        "{{user `ansible_host`}}",
+        "{{.Image}}",
+        "/bin/bash"
+      ]
     }
   ],
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "./ansible/playbook.yml"
+      "playbook_file": "./ansible/playbook.yml",
+      "only": [
+        "amazon-ebs"
+      ]
+    },
+    {
+      "type": "ansible",
+      "user": "root",
+      "playbook_file": "./ansible/playbook.yml",
+      "extra_arguments": [
+        "--extra-vars",
+        "ansible_host={{user `ansible_host`}} ansible_connection={{user `ansible_connection`}}"
+      ],
+      "only": [
+        "docker"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "docker-tag",
+      "repository": "pgalchemy/cassandra",
+      "tag": "latest",
+      "only": [
+        "docker"
+      ]
     }
   ]
 }

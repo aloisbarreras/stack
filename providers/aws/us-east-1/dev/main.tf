@@ -31,15 +31,14 @@ module "bastion" {
   environment     = "${var.environment}"
 }
 
-# module "cassandra" {
-#   source               = "../../../../modules/aws/data/cassandra"
-#   name                 = "${var.name}"
-#   key_name             = "${var.key_name}"
-#   ssh_private_key_path = "${var.ssh_private_key_path}"
-#   seed_ips             = "${var.cassandra_seed_ips}"
-#   subnets              = "${module.vpc.internal_subnets}"
-#   vpc_id               = "${module.vpc.id}"
-#   security_groups      = ["${module.security_groups.internal_ssh}", "${module.security_groups.allow_all_outbound}"]
-#   bastion_host         = "${module.bastion.external_ip}"
-#   bastion_user         = "${var.bastion_user}"
-# }
+module "cassandra" {
+  source               = "../../../../modules/aws/data/cassandra"
+  name                 = "${var.name}"
+  key_name             = "${var.key_name}"
+  ssh_private_key_path = "${var.ssh_private_key_path}"
+  subnets              = "${module.vpc.internal_subnets}"
+  vpc_id               = "${module.vpc.id}"
+  security_groups      = ["${module.security_groups.internal_ssh}", "${module.security_groups.allow_all_outbound}"]
+  bastion_host         = "${module.bastion.external_ip}"
+  bastion_user         = "${var.bastion_user}"
+}

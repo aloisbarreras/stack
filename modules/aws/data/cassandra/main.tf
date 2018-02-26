@@ -1,11 +1,19 @@
+module "seed_enis" {
+  source          = "./seed-enis"
+  subnets         = ["${var.subnets}"]
+  security_groups = ["${var.security_groups}", "${aws_security_group.cassandra_internal.id}"]
+}
+
 resource "aws_instance" "cassandra_seed" {
-  count                  = "${length(var.seed_ips)}"
-  subnet_id              = "${element(var.subnets, count.index)}"
-  ami                    = "${data.aws_ami.cassandra.id}"
-  instance_type          = "${var.instance_type}"
-  key_name               = "${var.key_name}"
-  private_ip             = "${element(var.seed_ips, count.index)}"
-  vpc_security_group_ids = ["${var.security_groups}", "${aws_security_group.cassandra_internal.id}"]
+  count         = "${length(var.subnets)}"
+  ami           = "${data.aws_ami.cassandra.id}"
+  instance_type = "${var.instance_type}"
+  key_name      = "${var.key_name}"
+
+  network_interface {
+    network_interface_id = "${element(module.seed_enis.ids, count.index)}"
+    device_index         = 0
+  }
 
   tags {
     Name = "${var.name}-cassandra-seed-${count.index}"

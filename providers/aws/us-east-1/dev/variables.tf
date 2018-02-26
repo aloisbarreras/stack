@@ -44,12 +44,6 @@ variable "availability_zones" {
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
-variable "cassandra_seed_ips" {
-  description = "The private IP addresses to give the cassandra seeds. needs to have as many elements as there are internal_subnets. IP must be in the cidr block of the internal subent in the same corresponding index"
-  type        = "list"
-  default     = ["10.30.1.5", "10.30.65.5", "10.30.128.5"]
-}
-
 variable "bastion_instance_type" {
   description = "Instance type for the bastion"
   default     = "t2.micro"

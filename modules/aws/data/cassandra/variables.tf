@@ -17,11 +17,6 @@ variable "subnets" {
   type        = "list"
 }
 
-variable "seed_ips" {
-  description = "The private IP addresses to give the cassandra seeds. Length must be the same as subnet_ids and the order must match the cidr block of the subnet_ids."
-  type        = "list"
-}
-
 variable "ssh_private_key_path" {}
 
 variable "security_groups" {

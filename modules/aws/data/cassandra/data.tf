@@ -20,13 +20,13 @@ data "aws_ami" "cassandra" {
 }
 
 data "template_file" "cassandra_seed_yaml" {
-  count    = "${length(var.seed_ips)}"
+  count    = "${length(var.subnets)}"
   template = "${file("${path.module}/templates/cassandra.yaml.tpl")}"
 
   vars {
     cluster_name   = "${var.name}"
-    seeds          = "${join(",", var.seed_ips)}"
-    listen_address = "${element(var.seed_ips, count.index)}"
-    rpc_address    = "${element(var.seed_ips, count.index)}"
+    seeds          = "${join(",", module.seed_enis.private_ips)}"
+    listen_address = "${element(module.seed_enis.private_ips, count.index)}"
+    rpc_address    = "${element(module.seed_enis.private_ips, count.index)}"
   }
 }

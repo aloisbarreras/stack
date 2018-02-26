@@ -7,8 +7,9 @@ variable "region" {
   description = "AWS Region, e.g us-east-1"
 }
 
-variable "security_group_ids" {
+variable "security_groups" {
   description = "a comma separated lists of security group IDs"
+  type        = "list"
 }
 
 variable "vpc_id" {
@@ -40,7 +41,7 @@ resource "aws_instance" "bastion" {
   instance_type          = "${var.instance_type}"
   subnet_id              = "${var.subnet_id}"
   key_name               = "${var.key_name}"
-  vpc_security_group_ids = ["${split(",",var.security_group_ids)}"]
+  vpc_security_group_ids = ["${var.security_groups}"]
   monitoring             = true
 
   tags {

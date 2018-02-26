@@ -1,0 +1,41 @@
+{
+  "variables": {
+    "name": "cassandra",
+    "profile": "",
+    "aws_region": "",
+    "ami_users": "",
+    "commit_sha": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `aws_region`}}",
+      "profile": "{{user `profile`}}",
+      "source_ami_filter": {
+        "filters": {
+          "product-code": "aw0evgkw8e5c1q413zgy5pjce",
+          "virtualization-type": "hvm",
+          "name": "CentOS Linux 7 x86_64 HVM EBS*",
+          "root-device-type": "ebs"
+        },
+        "most_recent": true
+      },
+      "ena_support": "true",
+      "instance_type": "t2.small",
+      "ssh_username": "centos",
+      "ami_name": "{{user `name`}}-{{timestamp}}",
+      "ami_description": "CentOS 7 AMI with Cassandra",
+      "ami_users": "{{user `ami_users`}}",
+      "tags": {
+        "OS_Version": "CentOS",
+        "Name": "{{user `name`}}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "./ansible/playbook.yml"
+    }
+  ]
+}

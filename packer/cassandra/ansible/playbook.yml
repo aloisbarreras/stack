@@ -1,0 +1,21 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Add cassandra repo
+      yum_repository:
+        name: cassandra
+        description: Apacha Cassandra repo
+        baseurl: https://www.apache.org/dist/cassandra/redhat/311x/
+        gpgcheck: yes
+        repo_gpgcheck: yes
+        gpgkey: https://www.apache.org/dist/cassandra/KEYS
+    - name: Install Java 8
+      yum:
+        name: java-1.8.0-openjdk
+        update_cache: yes
+    - name: Install cassandra
+      yum:
+        name: cassandra
+        update_cache: yes
+    - name: Delete files. See here - https://www.digitalocean.com/community/tutorials/how-to-run-a-multi-node-cluster-database-with-cassandra-on-ubuntu-14-04
+      shell: rm -rf /var/lib/cassandra/data/system/*

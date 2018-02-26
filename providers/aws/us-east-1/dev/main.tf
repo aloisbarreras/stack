@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "${var.region}"
+  region  = "${var.region}"
   profile = "${var.profile}"
 }
 
@@ -21,12 +21,25 @@ module "security_groups" {
 }
 
 module "bastion" {
-  source             = "../../../../modules/aws/network/bastion"
-  instance_type      = "${var.bastion_instance_type}"
-  region             = "${var.region}"
-  security_group_ids = "${module.security_groups.external_ssh}"
-  vpc_id             = "${module.vpc.id}"
-  subnet_id          = "${element(module.vpc.external_subnets, 0)}"
-  key_name           = "${var.key_name}"
-  environment        = "${var.environment}"
+  source          = "../../../../modules/aws/network/bastion"
+  instance_type   = "${var.bastion_instance_type}"
+  region          = "${var.region}"
+  security_groups = ["${module.security_groups.external_ssh}", "${module.security_groups.internal_ssh}", "${module.security_groups.allow_all_outbound}"]
+  vpc_id          = "${module.vpc.id}"
+  subnet_id       = "${element(module.vpc.external_subnets, 0)}"
+  key_name        = "${var.key_name}"
+  environment     = "${var.environment}"
 }
+
+# module "cassandra" {
+#   source               = "../../../../modules/aws/data/cassandra"
+#   name                 = "${var.name}"
+#   key_name             = "${var.key_name}"
+#   ssh_private_key_path = "${var.ssh_private_key_path}"
+#   seed_ips             = "${var.cassandra_seed_ips}"
+#   subnets              = "${module.vpc.internal_subnets}"
+#   vpc_id               = "${module.vpc.id}"
+#   security_groups      = ["${module.security_groups.internal_ssh}", "${module.security_groups.allow_all_outbound}"]
+#   bastion_host         = "${module.bastion.external_ip}"
+#   bastion_user         = "${var.bastion_user}"
+# }

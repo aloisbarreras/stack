@@ -14,6 +14,28 @@ variable "environment" {
   description = "The environment, used for tagging, e.g prod"
 }
 
+resource "aws_security_group" "allow_all_outbound" {
+  name        = "${format("%s-%s-allow-all-outbound", var.name, var.environment)}"
+  description = "Allows ssh from the world"
+  vpc_id      = "${var.vpc_id}"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags {
+    Name        = "${format("%s allow-all-outbound", var.name)}"
+    Environment = "${var.environment}"
+  }
+}
+
 resource "aws_security_group" "external_ssh" {
   name        = "${format("%s-%s-external-ssh", var.name, var.environment)}"
   description = "Allows ssh from the world"
@@ -23,13 +45,6 @@ resource "aws_security_group" "external_ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -45,15 +60,8 @@ resource "aws_security_group" "external_ssh" {
 
 resource "aws_security_group" "internal_ssh" {
   name        = "${format("%s-%s-internal-ssh", var.name, var.environment)}"
-  description = "Allows ssh from bastion"
+  description = "Allows internal ssh traffic"
   vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.external_ssh.id}"]
-  }
 
   lifecycle {
     create_before_destroy = true
@@ -63,6 +71,21 @@ resource "aws_security_group" "internal_ssh" {
     Name        = "${format("%s internal ssh", var.name)}"
     Environment = "${var.environment}"
   }
+}
+
+resource "aws_security_group_rule" "internal_ssh" {
+  type      = "ingress"
+  from_port = 22
+  to_port   = 22
+  protocol  = "tcp"
+
+  source_security_group_id = "${aws_security_group.internal_ssh.id}"
+  security_group_id        = "${aws_security_group.internal_ssh.id}"
+}
+
+// allows all outgoing traffic
+output "allow_all_outbound" {
+  value = "${aws_security_group.allow_all_outbound.id}"
 }
 
 // External SSH allows ssh connections on port 22 from the world.

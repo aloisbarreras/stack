@@ -43,6 +43,10 @@ variable "bastion_host" {
   description = "bastion host used as a jump server to execute commands on the cassandra nodes when bootstrapping"
 }
 
+variable "allow_traffic_from" {
+  type = "list"
+}
+
 variable "bastion_user" {}
 
 module "seeds" {
@@ -55,6 +59,7 @@ module "seeds" {
   security_groups      = "${var.security_groups}"
   bastion_host         = "${var.bastion_host}"
   bastion_user         = "${var.bastion_user}"
+  allow_traffic_from   = "${var.allow_traffic_from}"
 }
 
 output "seed_ips" {

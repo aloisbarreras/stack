@@ -44,3 +44,7 @@ variable "bastion_host" {
 }
 
 variable "bastion_user" {}
+
+variable "allow_traffic_from" {
+  type = "list"
+}

@@ -1,7 +1,7 @@
 module "enis" {
   source          = "./enis"
   subnets         = ["${var.subnets}"]
-  security_groups = ["${var.security_groups}", "${aws_security_group.cassandra_internal.id}"]
+  security_groups = ["${var.security_groups}", "${aws_security_group.cassandra_internal.id}", "${aws_security_group.allow_client_traffic.id}"]
 }
 
 resource "aws_instance" "cassandra_seed" {

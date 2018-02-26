@@ -39,6 +39,7 @@ module "cassandra" {
   subnets              = "${module.vpc.internal_subnets}"
   vpc_id               = "${module.vpc.id}"
   security_groups      = ["${module.security_groups.internal_ssh}", "${module.security_groups.default}"]
+  allow_traffic_from   = ["${module.security_groups.default}"]
   bastion_host         = "${module.bastion.external_ip}"
   bastion_user         = "${var.bastion_user}"
 }

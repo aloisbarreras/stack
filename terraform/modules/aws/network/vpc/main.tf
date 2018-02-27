@@ -1,17 +1,31 @@
-/**
- * The VPC module will create a VPC with 1 public and 1 private subnet inside each specified availability zone.
- * It will also attach an Internet Gateway to the VPC and attach Route Tables directing traffic from the public subnets to it
- * as well as create NAT Gateways and route private subnet traffic through them so instances in the private subnets can access the internet.
- * Since most of our instances aren't exposed to the external internet, the VPC has a bastion that acts as the gatekeeper for any direct SSH access.
- * The bastion is provisioned using the key name that you pass to the stack (and hopefully have stored somewhere).
- * If you ever need to access an instance directly, you can do it by "jumping through" the bastion.
- *
- */
+variable "cidr" {
+  description = "The CIDR block for the VPC."
+}
 
-/**
- * VPC
- */
+variable "external_subnets" {
+  description = "List of external subnets"
+  type        = "list"
+}
 
+variable "internal_subnets" {
+  description = "List of internal subnets"
+  type        = "list"
+}
+
+variable "environment" {
+  description = "Environment tag, e.g prod"
+}
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = "list"
+}
+
+variable "name" {
+  description = "Name tag, e.g my-stack"
+}
+
+// VPC
 resource "aws_vpc" "main" {
   cidr_block           = "${var.cidr}"
   enable_dns_support   = true
@@ -23,10 +37,7 @@ resource "aws_vpc" "main" {
   }
 }
 
-/**
- * NAT Gateways
- */
-
+// NAT Gateways
 resource "aws_internet_gateway" "main" {
   vpc_id = "${aws_vpc.main.id}"
 
@@ -48,10 +59,7 @@ resource "aws_eip" "nat" {
   vpc   = true
 }
 
-/**
- * Subnets.
- */
-
+// Subnets
 resource "aws_subnet" "internal" {
   vpc_id            = "${aws_vpc.main.id}"
   cidr_block        = "${element(var.internal_subnets, count.index)}"
@@ -77,10 +85,7 @@ resource "aws_subnet" "external" {
   }
 }
 
-/**
- * Route tables
- */
-
+// Route Tables
 resource "aws_route_table" "external" {
   vpc_id = "${aws_vpc.main.id}"
 
@@ -113,10 +118,7 @@ resource "aws_route" "internal" {
   nat_gateway_id         = "${element(aws_nat_gateway.main.*.id, count.index)}"
 }
 
-/**
- * Route associations
- */
-
+// Route Associations
 resource "aws_route_table_association" "internal" {
   count          = "${length(var.internal_subnets)}"
   subnet_id      = "${element(aws_subnet.internal.*.id, count.index)}"
@@ -127,4 +129,49 @@ resource "aws_route_table_association" "external" {
   count          = "${length(var.external_subnets)}"
   subnet_id      = "${element(aws_subnet.external.*.id, count.index)}"
   route_table_id = "${aws_route_table.external.id}"
+}
+
+// The VPC ID
+output "id" {
+  value = "${aws_vpc.main.id}"
+}
+
+// The VPC CIDR
+output "cidr_block" {
+  value = "${aws_vpc.main.cidr_block}"
+}
+
+// A comma-separated list of subnet IDs.
+output "external_subnets" {
+  value = ["${aws_subnet.external.*.id}"]
+}
+
+// A list of subnet IDs.
+output "internal_subnets" {
+  value = ["${aws_subnet.internal.*.id}"]
+}
+
+// The default VPC security group ID.
+output "security_group" {
+  value = "${aws_vpc.main.default_security_group_id}"
+}
+
+// The list of availability zones of the VPC.
+output "availability_zones" {
+  value = ["${aws_subnet.external.*.availability_zone}"]
+}
+
+// The internal route table ID.
+output "internal_rtb_id" {
+  value = "${join(",", aws_route_table.internal.*.id)}"
+}
+
+// The external route table ID.
+output "external_rtb_id" {
+  value = "${aws_route_table.external.id}"
+}
+
+// The list of EIPs associated with the internal subnets.
+output "internal_nat_ips" {
+  value = ["${aws_eip.nat.*.public_ip}"]
 }

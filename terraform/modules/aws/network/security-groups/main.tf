@@ -164,32 +164,60 @@ resource "aws_security_group" "external_ssh" {
 }
 
 resource "aws_security_group" "internal_rdp" {
-  vpc_id = "${var.vpc_id}"
+  name        = "${format("%s-%s-internal-rdp", var.name, var.environment)}"
+  vpc_id      = "${var.vpc_id}"
+  description = "Allows rdp from bastion"
+
+  ingress {
+    from_port       = 3389
+    to_port         = 3389
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.external_rdp.id}"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr}"]
+  }
 
   lifecycle {
     create_before_destroy = true
   }
 
-  ingress {
-    from_port   = 3389
-    to_port     = 3389
-    protocol    = "tcp"
-    cidr_blocks = ["${var.cidr}"]
+  tags {
+    Name        = "${format("%s internal rdp", var.name)}"
+    Environment = "${var.environment}"
   }
 }
 
 resource "aws_security_group" "external_rdp" {
-  vpc_id = "${var.vpc_id}"
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  name        = "${format("%s-%s-external-rdp", var.name, var.environment)}"
+  vpc_id      = "${var.vpc_id}"
+  description = "Allows rdp from the world"
 
   ingress {
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags {
+    Name        = "${format("%s external rdp", var.name)}"
+    Environment = "${var.environment}"
   }
 }
 

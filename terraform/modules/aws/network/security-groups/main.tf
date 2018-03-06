@@ -256,6 +256,28 @@ resource "aws_security_group_rule" "psql_egress" {
   security_group_id        = "${aws_security_group.internal_psql.id}"
 }
 
+resource "aws_security_group" "external_psql" {
+  name        = "${format("%s-%s-external-psql", var.name, var.environment)}"
+  vpc_id      = "${var.vpc_id}"
+  description = "Allows psql traffic from the world"
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags {
+    Name        = "${format("%s external psql", var.name)}"
+    Environment = "${var.environment}"
+  }
+}
+
 // Allow Outbound allows all outgoing traffic
 output "allow_outbound" {
   value = "${aws_security_group.allow_outbound.id}"
@@ -293,5 +315,10 @@ output "external_rdp" {
 
 // Internal PSQL allows postgres psql connections on port 5432
 output "internal_psql" {
-  value = "${aws_security_group.external_rdp.id}"
+  value = "${aws_security_group.internal_psql.id}"
+}
+
+// External PSQL allows postgres psql connections on port 5432 from the world
+output "external_psql" {
+  value = "${aws_security_group.external_psql.id}"
 }

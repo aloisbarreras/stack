@@ -221,6 +221,41 @@ resource "aws_security_group" "external_rdp" {
   }
 }
 
+resource "aws_security_group" "internal_psql" {
+  name        = "${format("%s-%s-internal-psql", var.name, var.environment)}"
+  vpc_id      = "${var.vpc_id}"
+  description = "Allows psql traffic"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags {
+    Name        = "${format("%s internal psql", var.name)}"
+    Environment = "${var.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "psql_ingress" {
+  type      = "ingress"
+  from_port = 5432
+  to_port   = 5432
+  protocol  = "tcp"
+
+  source_security_group_id = "${aws_security_group.internal_psql.id}"
+  security_group_id        = "${aws_security_group.internal_psql.id}"
+}
+
+resource "aws_security_group_rule" "psql_egress" {
+  type      = "egress"
+  from_port = 5432
+  to_port   = 5432
+  protocol  = "tcp"
+
+  source_security_group_id = "${aws_security_group.internal_psql.id}"
+  security_group_id        = "${aws_security_group.internal_psql.id}"
+}
+
 // Allow Outbound allows all outgoing traffic
 output "allow_outbound" {
   value = "${aws_security_group.allow_outbound.id}"
@@ -253,5 +288,10 @@ output "internal_rdp" {
 
 // External RDP allows windows rdp connections on port 3389 from the world.
 output "external_rdp" {
+  value = "${aws_security_group.external_rdp.id}"
+}
+
+// Internal PSQL allows postgres psql connections on port 5432
+output "internal_psql" {
   value = "${aws_security_group.external_rdp.id}"
 }

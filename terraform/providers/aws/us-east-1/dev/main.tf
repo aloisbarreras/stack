@@ -32,7 +32,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source             = "github.com/aloisbarreras/stack/terraform/modules/aws/network/vpc"
+  source             = "../../../../modules/aws/network/vpc"
   name               = "${var.name}"
   environment        = "${var.environment}"
   cidr               = "${var.cidr}"
@@ -42,7 +42,7 @@ module "vpc" {
 }
 
 module "security_groups" {
-  source      = "github.com/aloisbarreras/stack/terraform/modules/aws/network/security-groups"
+  source      = "../../../../modules/aws/network/security-groups"
   vpc_id      = "${module.vpc.id}"
   name        = "${var.name}"
   environment = "${var.environment}"
@@ -50,7 +50,7 @@ module "security_groups" {
 }
 
 module "bastion" {
-  source          = "github.com/aloisbarreras/stack/terraform/modules/aws/network/bastion"
+  source          = "../../../../modules/aws/network/bastion"
   security_groups = "${module.security_groups.external_ssh},${module.security_groups.external_rdp}"
   vpc_id          = "${module.vpc.id}"
   key_name        = "${var.key_name}"

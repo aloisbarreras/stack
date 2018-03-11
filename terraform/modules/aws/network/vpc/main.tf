@@ -178,5 +178,5 @@ output "internal_nat_ips" {
 
 // The list of EIPs associated with the internal subnets.
 output "internal_nat_ids" {
-  value = ["${aws_eip.nat.*.id}"]
+  value = ["${aws_nat_gateway.main.*.id}"]
 }

@@ -141,7 +141,7 @@ output "cidr_block" {
   value = "${aws_vpc.main.cidr_block}"
 }
 
-// A comma-separated list of subnet IDs.
+// A list of subnet IDs.
 output "external_subnets" {
   value = ["${aws_subnet.external.*.id}"]
 }
@@ -149,6 +149,11 @@ output "external_subnets" {
 // A list of subnet IDs.
 output "internal_subnets" {
   value = ["${aws_subnet.internal.*.id}"]
+}
+
+// A list of subnet IDs.
+output "subnets" {
+  value = ["${aws_subnet.internal.*.id}", "${aws_subnet.external.*.id}"]
 }
 
 // The default VPC security group ID.

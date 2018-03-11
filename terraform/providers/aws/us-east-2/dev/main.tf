@@ -58,10 +58,6 @@ module "bastion" {
   environment     = "${var.environment}"
 }
 
-module "k8s" {
-  source = "./out/terraform"
-}
-
 output "bastion_ip" {
   value = "${module.bastion.external_ip}"
 }

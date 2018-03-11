@@ -151,11 +151,6 @@ output "internal_subnets" {
   value = ["${aws_subnet.internal.*.id}"]
 }
 
-// A list of subnet IDs.
-output "subnets" {
-  value = ["${aws_subnet.internal.*.id}", "${aws_subnet.external.*.id}"]
-}
-
 // The default VPC security group ID.
 output "security_group" {
   value = "${aws_vpc.main.default_security_group_id}"

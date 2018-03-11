@@ -79,7 +79,7 @@ output "external_subnets" {
 }
 
 output "subnets" {
-  value = ["${module.vpc.external_subnets}", "${module.vpc.internal_subnets}"]
+  value = ["${module.vpc.internal_subnets}", "${module.vpc.external_subnets}"]
 }
 
 output "availability_zones" {

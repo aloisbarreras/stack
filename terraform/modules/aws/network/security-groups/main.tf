@@ -271,6 +271,41 @@ resource "aws_security_group" "external_psql" {
   }
 }
 
+resource "aws_security_group" "internal_redis" {
+  name        = "${format("%s-%s-internal-redis", var.name, var.environment)}"
+  vpc_id      = "${var.vpc_id}"
+  description = "Allows incoming and outgoing redis traffic"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags {
+    Name        = "${format("%s internal redis", var.name)}"
+    Environment = "${var.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "redis_ingress" {
+  type      = "ingress"
+  from_port = 6379
+  to_port   = 6379
+  protocol  = "tcp"
+
+  source_security_group_id = "${aws_security_group.internal_redis.id}"
+  security_group_id        = "${aws_security_group.internal_redis.id}"
+}
+
+resource "aws_security_group_rule" "redis_egress" {
+  type      = "egress"
+  from_port = 6379
+  to_port   = 6379
+  protocol  = "tcp"
+
+  source_security_group_id = "${aws_security_group.internal_redis.id}"
+  security_group_id        = "${aws_security_group.internal_redis.id}"
+}
+
 // Allow Outbound allows all outgoing traffic
 output "allow_outbound" {
   value = "${aws_security_group.allow_outbound.id}"
@@ -314,4 +349,9 @@ output "internal_psql" {
 // External PSQL allows postgres psql connections on port 5432 from the world
 output "external_psql" {
   value = "${aws_security_group.external_psql.id}"
+}
+
+// Internal Redis allows redis connections on port 6379
+output "internal_redis" {
+  value = "${aws_security_group.internal_redis.id}"
 }

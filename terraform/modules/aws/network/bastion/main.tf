@@ -9,6 +9,8 @@
  *
  */
 
+variable "name" {}
+
 variable "instance_type" {
   default     = "t2.micro"
   description = "Instance type, see a list at: https://aws.amazon.com/ec2/instance-types/"
@@ -35,19 +37,19 @@ variable "environment" {
 }
 
 data "aws_ami" "ubuntu" {
-    most_recent = true
+  most_recent = true
 
-    filter {
-        name   = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
-    }
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+  }
 
-    filter {
-        name   = "virtualization-type"
-        values = ["hvm"]
-    }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 
-    owners = ["099720109477"] # Canonical
+  owners = ["099720109477"] # Canonical
 }
 
 resource "aws_instance" "bastion" {
@@ -60,7 +62,7 @@ resource "aws_instance" "bastion" {
   monitoring             = true
 
   tags {
-    Name        = "bastion"
+    Name        = "${var.name}-bastion"
     Environment = "${var.environment}"
   }
 }

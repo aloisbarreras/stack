@@ -49,7 +49,7 @@ resource "aws_db_subnet_group" "main" {
 }
 
 resource "aws_db_instance" "main" {
-  identifier             = "${var.name}-${var.environment}-${var.engine}"
+  identifier             = "${var.name}-${var.engine}"
   allocated_storage      = "${var.allocated_storage}"
   storage_type           = "${var.storage_type}"
   engine                 = "${var.engine}"

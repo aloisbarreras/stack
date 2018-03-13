@@ -5,6 +5,7 @@ variable "engine" {}
 variable "engine_version" {}
 variable "username" {}
 variable "password" {}
+variable "multi_az" {}
 
 variable "storage_type" {
   default = "gp2"
@@ -61,6 +62,7 @@ resource "aws_db_instance" "main" {
   vpc_security_group_ids = ["${var.security_groups}"]
   publicly_accessible    = "${var.publicly_accessible}"
   skip_final_snapshot    = "${var.skip_final_snapshot}"
+  multi_az               = "${var.multi_az}"
 
   depends_on = ["aws_db_subnet_group.main"]
 

@@ -23,7 +23,7 @@ variable "publicly_accessible" {
 }
 
 variable "skip_final_snapshot" {
-  default = true
+  default = false
 }
 
 variable "subnets" {

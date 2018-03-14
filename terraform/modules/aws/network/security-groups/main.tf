@@ -18,28 +18,6 @@ variable "cidr" {
   description = "The cidr block to use for internal security groups"
 }
 
-resource "aws_security_group" "allow_outbound" {
-  name        = "${format("%s-%s-allow-outbound", var.name, var.environment)}"
-  vpc_id      = "${var.vpc_id}"
-  description = "Allows outbound traffic"
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags {
-    Name        = "${format("%s allow outbound", var.name)}"
-    Environment = "${var.environment}"
-  }
-}
-
 resource "aws_security_group" "internal_elb" {
   name        = "${format("%s-%s-internal-elb", var.name, var.environment)}"
   vpc_id      = "${var.vpc_id}"
@@ -175,6 +153,13 @@ resource "aws_security_group" "internal_rdp" {
     cidr_blocks = ["${var.cidr}"]
   }
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -194,6 +179,13 @@ resource "aws_security_group" "external_rdp" {
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
     cidr_blocks = ["0.0.0.0/0"]
   }
 

@@ -5,6 +5,6 @@
       nfs_exports:
         - /var/opt/gitlab/git-data *(rw,sync,no_root_squash)
         - /var/opt/gitlab/.ssh *(rw,sync,no_root_squash)
-        - /var/opt/gitlab/.ssh *(rw,sync,no_root_squash)
+        - /var/opt/gitlab/gitlab-rails/uploads *(rw,sync,no_root_squash)
         - /var/opt/gitlab/gitlab-rails/shared *(rw,sync,no_root_squash)
         - /var/opt/gitlab/gitlab-ci/builds *(rw,sync,no_root_squash)

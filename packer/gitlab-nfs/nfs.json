@@ -4,7 +4,7 @@
     "profile": "",
     "aws_region": "",
     "ami_users": "",
-    "commit_sha": ""
+    "cidr": "10.30.0.0/16"
   },
   "builders": [
     {
@@ -24,7 +24,7 @@
       "instance_type": "t2.small",
       "ssh_username": "centos",
       "ami_name": "{{user `name`}}-{{timestamp}}",
-      "ami_description": "CentOS 7 AMI with Cassandra",
+      "ami_description": "CentOS 7 with NFS gitlab folders shared",
       "ami_users": "{{user `ami_users`}}",
       "tags": {
         "OS_Version": "CentOS",
@@ -35,7 +35,11 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "./ansible/playbook.yml"
+      "playbook_file": "./ansible/playbook.yml",
+      "extra_arguments": [
+        "--extra-vars",
+        "cidr={{user `cidr`}}"
+      ]
     }
   ]
 }

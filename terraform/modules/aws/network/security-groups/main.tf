@@ -265,11 +265,6 @@ resource "aws_security_group" "internal_redis" {
   }
 }
 
-// Allow Outbound allows all outgoing traffic
-output "allow_outbound" {
-  value = "${aws_security_group.allow_outbound.id}"
-}
-
 // Internal ELB allows internal traffic.
 output "internal_elb" {
   value = "${aws_security_group.internal_elb.id}"

@@ -169,15 +169,8 @@ resource "aws_security_group" "internal_rdp" {
   description = "Allows rdp from bastion"
 
   ingress {
-    from_port       = 3389
-    to_port         = 3389
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.external_rdp.id}"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
+    from_port   = 3389
+    to_port     = 3389
     protocol    = "tcp"
     cidr_blocks = ["${var.cidr}"]
   }
@@ -219,6 +212,13 @@ resource "aws_security_group" "internal_psql" {
   vpc_id      = "${var.vpc_id}"
   description = "Allows incoming and outgoing psql traffic"
 
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr}"]
+  }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -227,26 +227,6 @@ resource "aws_security_group" "internal_psql" {
     Name        = "${format("%s internal psql", var.name)}"
     Environment = "${var.environment}"
   }
-}
-
-resource "aws_security_group_rule" "psql_ingress" {
-  type      = "ingress"
-  from_port = 5432
-  to_port   = 5432
-  protocol  = "tcp"
-
-  source_security_group_id = "${aws_security_group.internal_psql.id}"
-  security_group_id        = "${aws_security_group.internal_psql.id}"
-}
-
-resource "aws_security_group_rule" "psql_egress" {
-  type      = "egress"
-  from_port = 5432
-  to_port   = 5432
-  protocol  = "tcp"
-
-  source_security_group_id = "${aws_security_group.internal_psql.id}"
-  security_group_id        = "${aws_security_group.internal_psql.id}"
 }
 
 resource "aws_security_group" "external_psql" {
@@ -274,7 +254,14 @@ resource "aws_security_group" "external_psql" {
 resource "aws_security_group" "internal_redis" {
   name        = "${format("%s-%s-internal-redis", var.name, var.environment)}"
   vpc_id      = "${var.vpc_id}"
-  description = "Allows incoming and outgoing redis traffic"
+  description = "Allows redis trafffic within the vpc"
+
+  ingress {
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr}"]
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -284,26 +271,6 @@ resource "aws_security_group" "internal_redis" {
     Name        = "${format("%s internal redis", var.name)}"
     Environment = "${var.environment}"
   }
-}
-
-resource "aws_security_group_rule" "redis_ingress" {
-  type      = "ingress"
-  from_port = 6379
-  to_port   = 6379
-  protocol  = "tcp"
-
-  source_security_group_id = "${aws_security_group.internal_redis.id}"
-  security_group_id        = "${aws_security_group.internal_redis.id}"
-}
-
-resource "aws_security_group_rule" "redis_egress" {
-  type      = "egress"
-  from_port = 6379
-  to_port   = 6379
-  protocol  = "tcp"
-
-  source_security_group_id = "${aws_security_group.internal_redis.id}"
-  security_group_id        = "${aws_security_group.internal_redis.id}"
 }
 
 // Allow Outbound allows all outgoing traffic

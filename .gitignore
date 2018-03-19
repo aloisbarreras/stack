@@ -7,3 +7,5 @@
 playbook.retry
 
 *.plan
+
+*.tfvars
